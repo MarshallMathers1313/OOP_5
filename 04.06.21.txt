@@ -1,0 +1,149 @@
+#include <iostream>
+using namespace std;
+class Anything
+{
+	int value;
+public:
+	Anything() : value{ 0 } {}
+	void add(int value)
+	{
+		this->value = value;
+	}
+	//friend function
+	friend void reset(Anything& first);
+};
+
+void reset(Anything& first)
+{
+	first.value = 0;
+}
+
+int main()
+{
+	Anything first;
+	first.add(5);
+	return 0;
+}
+
+=====================================
+#include <iostream>
+using namespace std;
+class Something
+{
+	int m_value;
+public:
+	explicit Something(int value) :m_value{ value } {}
+	friend bool isEqual(const Something& value1, const Something& value2);
+};
+
+bool isEqual(const Something& value1, const Something& value2)
+{
+	return (value1.m_value == value2.m_value);
+}
+
+int main()
+{
+	Something value1(5);
+	Something value2(5);
+	if (isEqual(value1, value2))
+		cout << "True\n";
+	else
+		cout << "False\n";
+	return 0;
+}
+
+=====================================
+#include <iostream>
+using namespace std;
+
+class Values
+{
+	int m_intValue;
+	double m_dValue;
+public:
+	explicit Values(int intValue, double dValue)
+		:m_intValue{ intValue }, m_dValue{ dValue }{}
+	friend class Display;
+};
+class Display
+{
+	bool m_displayIntFirst;
+public:
+	Display(bool displayIntFirst)
+		:m_displayIntFirst{ displayIntFirst } {}
+
+	void displayItem(Values& value)
+	{
+		if (m_displayIntFirst)
+			cout << value.m_intValue << " " << value.m_dValue << endl;
+		else
+			cout << value.m_dValue << " " << value.m_intValue << endl;
+	}
+};
+
+int main()
+{
+	Values value(7, 8.4);
+	Display display(false);
+	display.displayItem(value);
+}
+
+
+=================================
+Point.h
+#pragma once
+#include <iostream>
+using namespace std;
+class Point
+{
+	int x;
+	int y;
+public:
+	//Конструктор
+	explicit Point(int x, int y): x{x}, y{y}{}
+	//Делигированный конструктор
+	Point():Point(0,0){}
+
+	void display()const;
+	friend Point operator+(Point& p1, Point& p2);
+};
+
+Point.cpp
+#include <iostream>
+#include "Point.h"
+using namespace std;
+
+void Point::display()const
+{
+	cout << "(" << x << ", " << y << ")" << endl;
+}
+
+Main.cpp
+#include <iostream>
+#include "Point.h"
+using namespace std;
+
+Point operator+(Point& p1, Point& p2)
+{
+	/*Point p3;
+	p3.x = p1.x + p2.x;
+	p3.y = p1.y + p2.y;
+	return p3;*/
+	
+	return Point(p1.x + p2.x, p1.y + p2.y);
+}
+
+int main()
+{
+	Point p1(1, 1);
+	p1.display();
+
+	Point p2(2, 2);
+	p2.display();
+
+	Point p3 = p1 + p2;
+	//Point p3 = Point(3, 3);
+	p3.display();
+
+	return 0;
+}
